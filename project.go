@@ -118,3 +118,18 @@ func (s *ProjectService) Get(projectID string) (*Project, *Response, error) {
 	}
 	return project, resp, nil
 }
+
+func (s *ProjectService) GetVersions(projectID string) (*[]Version, *Response, error) {
+	apiEndpoint := fmt.Sprintf("/rest/api/2/project/%s/versions", projectID)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	versions := make([]Version, 0)
+	resp, err := s.client.Do(req, &versions)
+	if err != nil {
+		return nil, resp, err
+	}
+	return &versions, resp, nil
+}

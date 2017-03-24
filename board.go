@@ -49,6 +49,10 @@ type sprintsResult struct {
 	Sprints []Sprint `json:"values" structs:"values"`
 }
 
+type backlogResults struct {
+	Backlog []Issue `json:"issues" structs:"issues"`
+}
+
 // Sprint represents a sprint on JIRA agile board
 type Sprint struct {
 	ID            int        `json:"id" structs:"id"`
@@ -59,6 +63,10 @@ type Sprint struct {
 	OriginBoardID int        `json:"originBoardId" structs:"originBoardId"`
 	Self          string     `json:"self" structs:"self"`
 	State         string     `json:"state" structs:"state"`
+}
+
+type epicResults struct {
+	Epics []Epic `json:"values" structs:"values"`
 }
 
 // GetAllBoards will returns all boards. This only includes boards that the user has permission to view.
@@ -143,7 +151,7 @@ func (s *BoardService) DeleteBoard(boardID int) (*Board, *Response, error) {
 //
 // JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board/{boardId}/sprint
 func (s *BoardService) GetAllSprints(boardID string) ([]Sprint, *Response, error) {
-	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/sprint", boardID)
+	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/sprint?maxResults=1000", boardID)
 	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
 	if err != nil {
 		return nil, nil, err
@@ -152,4 +160,36 @@ func (s *BoardService) GetAllSprints(boardID string) ([]Sprint, *Response, error
 	result := new(sprintsResult)
 	resp, err := s.client.Do(req, result)
 	return result.Sprints, resp, err
+}
+
+// GetEpicsForBoard will returns all epics from a board, for a given board Id.
+// This only includes epics that the user has permission to view.
+//
+// JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board/{boardId}/epic-getEpics
+func (s *BoardService) GetEpicsForBoard(boardID string) ([]Epic, *Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/epic?maxResults=1000", boardID)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := new(epicResults)
+	resp, err := s.client.Do(req, result)
+	return result.Epics, resp, err
+}
+
+// GetIssuesForBacklog will returns all issues on a board's backlog, for a given board Id.
+// This only includes issues that the user has permission to view.
+//
+// JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board-getIssuesForBacklog
+func (s *BoardService) GetIssuesForBacklog(boardID string) ([]Issue, *Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/backlog?maxResults=1000", boardID)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := new(backlogResults)
+	resp, err := s.client.Do(req, result)
+	return result.Backlog, resp, err
 }

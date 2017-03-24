@@ -46,7 +46,7 @@ func (s *SprintService) MoveIssuesToSprint(sprintID int, issueIDs []string) (*Re
 //
 //  JIRA API Docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/sprint-getIssuesForSprint
 func (s *SprintService) GetIssuesForSprint(sprintID int) ([]Issue, *Response, error) {
-	apiEndpoint := fmt.Sprintf("rest/agile/1.0/sprint/%d/issue", sprintID)
+	apiEndpoint := fmt.Sprintf("rest/agile/1.0/sprint/%d/issue?maxResults=1000", sprintID)
 
 	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
 
