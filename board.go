@@ -181,7 +181,7 @@ func (s *BoardService) CreateBoard(board *Board) (*Board, *Response, error) {
 // GetBoardConfig will return the configuration for a board, given a board Id.
 //
 // JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board-getConfiguration
-func (s *BoardService) GetBoardConfig(boardID int) (*BoardConfiguration, *Response, error) {
+func (s *BoardService) GetBoardConfig(boardID string) (*BoardConfiguration, *Response, error) {
 	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/configuration", boardID)
 	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
 	if err != nil {
