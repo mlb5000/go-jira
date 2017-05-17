@@ -69,6 +69,52 @@ type epicResults struct {
 	Epics []Epic `json:"values" structs:"values"`
 }
 
+type ConfigFilter struct {
+	ID   string `json:"id" structs:"id"`
+	Self string `json:"self" structs:"self"`
+}
+
+type BoardStatus struct {
+	ID   string `json:"id" structs:"id"`
+	Self string `json:"self" structs:"self"`
+}
+
+type Column struct {
+	Name     string        `json:"name" structs:"name"`
+	Statuses []BoardStatus `json:"statuses" structs:"statuses"`
+	Min      int           `json:"min" structs:"min"`
+	Max      int           `json:"max" structs:"max"`
+}
+
+type ColumnConfig struct {
+	Columns        []Column `json:"columns" structs:"columns"`
+	ConstraintType string   `json:"constraintType" structs:"constraintType"`
+}
+
+type BoardEstimationField struct {
+	FieldId     string `json:"fieldId" structs:"fieldId"`
+	DisplayName string `json:"displayName" structs:"displayName"`
+}
+
+type Estimation struct {
+	Type  string               `json:"type" structs:"type"`
+	Field BoardEstimationField `json:"field" structs:"field"`
+}
+
+type Ranking struct {
+	RankCustomFieldId int `json:"rankCustomFieldId" structs:"rankCustomFieldId"`
+}
+
+type BoardConfiguration struct {
+	ID           int          `json:"id" structs:"id"`
+	Name         string       `json:"name" structs:"name"`
+	Self         string       `json:"self" structs:"self"`
+	Filter       ConfigFilter `json:"filter" structs:"filter"`
+	ColumnConfig ColumnConfig `json:"columnConfig" structs:"columnConfig"`
+	Estimation   Estimation   `json:"estimation" structs:"estimation"`
+	Ranking      Ranking      `json:"ranking" structs:"ranking"`
+}
+
 // GetAllBoards will returns all boards. This only includes boards that the user has permission to view.
 //
 // JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board-getAllBoards
@@ -130,6 +176,21 @@ func (s *BoardService) CreateBoard(board *Board) (*Board, *Response, error) {
 	}
 
 	return responseBoard, resp, nil
+}
+
+// GetBoardConfig will return the configuration for a board, given a board Id.
+//
+// JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board-getConfiguration
+func (s *BoardService) GetBoardConfig(boardID int) (*BoardConfiguration, *Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/configuration", boardID)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := new(BoardConfiguration)
+	resp, err := s.client.Do(req, result)
+	return result, resp, err
 }
 
 // DeleteBoard will delete an agile board.
