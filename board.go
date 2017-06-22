@@ -254,3 +254,29 @@ func (s *BoardService) GetIssuesForBacklog(boardID string) ([]Issue, *Response, 
 	resp, err := s.client.Do(req, result)
 	return result.Backlog, resp, err
 }
+
+// JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board/{boardId}/epic-getIssuesForEpic
+func (s *BoardService) GetIssuesForEpic(boardID string, epicID string) ([]Issue, *Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/epic/%s/issue?maxResults=1000", boardID, epicID)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := new(backlogResults)
+	resp, err := s.client.Do(req, result)
+	return result.Backlog, resp, err
+}
+
+// JIRA API docs: https://docs.atlassian.com/jira-software/REST/cloud/#agile/1.0/board/{boardId}/epic-getIssuesWithoutEpic
+func (s *BoardService) GetIssuesWithoutEpic(boardID string) ([]Issue, *Response, error) {
+	apiEndpoint := fmt.Sprintf("rest/agile/1.0/board/%s/epic/none/issue?maxResults=1000", boardID)
+	req, err := s.client.NewRequest("GET", apiEndpoint, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	result := new(backlogResults)
+	resp, err := s.client.Do(req, result)
+	return result.Backlog, resp, err
+}

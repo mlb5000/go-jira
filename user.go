@@ -56,6 +56,23 @@ func (s *UserService) Get(username string) (*User, *Response, error) {
 	return user, resp, nil
 }
 
+// Myself gets the current user from JIRA
+//
+// JIRA API docs: https://docs.atlassian.com/jira/REST/cloud/#api/2/myself-getUser
+func (s *UserService) Myself() (*User, *Response, error) {
+	req, err := s.client.NewRequest("GET", "/rest/api/2/myself", nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	user := new(User)
+	resp, err := s.client.Do(req, user)
+	if err != nil {
+		return nil, resp, err
+	}
+	return user, resp, nil
+}
+
 // Create creates an user in JIRA.
 //
 // JIRA API docs: https://docs.atlassian.com/jira/REST/cloud/#api/2/user-createUser
